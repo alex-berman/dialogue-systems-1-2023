@@ -34,6 +34,10 @@ const grammar: Grammar = {
     intent: "None",
     entities: { time: "10:00" },
   },
+  "who is alex?": {
+    intent: "who_is_x",
+    entities: { person_name: "Alex" }
+  }
 };
 
 const getEntity = (context: SDSContext, entity: string) => {
@@ -77,6 +81,10 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
           {
             target: "create_meeting",
             cond: (context) => (getIntent(context) == "create_meeting")
+          },
+          {
+            target: "who_is_x",
+            cond: (context) => (getIntent(context) == "who_is_x")
           },
           {
             target: ".nomatch",
@@ -130,6 +138,14 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
             "Sorry, I don't know what it is. Tell me something I know."
           ),
           on: { ENDSPEECH: "ask" },
+        },
+      },
+    },
+    who_is_x: {
+      initial: "answer",
+      states: {
+        answer: {
+          entry: say("I don't know who that is."),
         },
       },
     },
