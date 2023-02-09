@@ -14,6 +14,10 @@ interface Grammar {
 }
 
 const grammar: Grammar = {
+  "create a meeting": {
+    intent: "create_meeting",
+    entities: {}
+  },
   lecture: {
     intent: "None",
     entities: { title: "Dialogue systems lecture" },
@@ -43,6 +47,15 @@ const getEntity = (context: SDSContext, entity: string) => {
   return false;
 };
 
+const getIntent = (context: SDSContext) => {
+  // lowercase the utterance and remove tailing "."
+  let u = context.recResult[0].utterance.toLowerCase().replace(/\.$/g, "");
+  if (u in grammar) {
+    return grammar[u].intent;
+  }
+  return false;
+};
+
 export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
   initial: "idle",
   states: {
@@ -58,6 +71,36 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
       },
     },
     welcome: {
+      initial: "prompt",
+      on: {
+        RECOGNISED: [
+          {
+            target: "create_meeting",
+            cond: (context) => (getIntent(context) == "create_meeting")
+          },
+          {
+            target: ".nomatch",
+          },
+        ],
+        TIMEOUT: ".prompt",
+      },
+      states: {
+        prompt: {
+          entry: say("How can I help you?"),
+          on: { ENDSPEECH: "ask" },
+        },
+        ask: {
+          entry: send("LISTEN"),
+        },
+        nomatch: {
+          entry: say(
+            "Sorry, I don't know what it is. Tell me something I know."
+          ),
+          on: { ENDSPEECH: "ask" },
+        },
+      },
+    },
+    create_meeting: {
       initial: "prompt",
       on: {
         RECOGNISED: [
