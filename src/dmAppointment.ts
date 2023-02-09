@@ -144,6 +144,40 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
         },
       },
     },
+    info: {
+      entry: send((context) => ({
+        type: "SPEAK",
+        value: `OK, ${context.title}`,
+      })),
+      on: { ENDSPEECH: "date" },
+    },
+    date: {
+      entry: say("On which date is it?"),
+      on: { ENDSPEECH: "ask" },
+      states: {
+        ask: {
+          entry: send("LISTEN"),
+        },
+      },
+      on: {
+        RECOGNISED: [
+          {
+            target: "confirm",
+            cond: (context) => !!getEntity(context, "date"),
+            actions: assign({
+              date: (context) => getEntity(context, "date"),
+            }),
+          },
+          {
+            target: ".nomatch",
+          },
+        ],
+        TIMEOUT: ".prompt",
+      },
+    },
+    confirm: {
+      entry: say("Your meeting has been created!"),
+    },
     who_is_x: {
       initial: "answer",
       states: {
@@ -154,13 +188,6 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
           })),
         },
       },
-    },
-    info: {
-      entry: send((context) => ({
-        type: "SPEAK",
-        value: `OK, ${context.title}`,
-      })),
-      on: { ENDSPEECH: "init" },
     },
   },
 };
