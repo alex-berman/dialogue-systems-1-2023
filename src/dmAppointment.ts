@@ -84,7 +84,10 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
           },
           {
             target: "who_is_x",
-            cond: (context) => (getIntent(context) == "who_is_x")
+            cond: (context) => (getIntent(context) == "who_is_x"),
+            actions: assign({
+              name: (context) => getEntity(context, "person_name"),
+            }),
           },
           {
             target: ".nomatch",
@@ -145,7 +148,10 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
       initial: "answer",
       states: {
         answer: {
-          entry: say("I don't know who that is."),
+          entry: send((context) => ({
+            type: "SPEAK",
+            value: `I don't know who ${context.name} is.`,
+          })),
         },
       },
     },
