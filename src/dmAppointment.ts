@@ -52,11 +52,15 @@ const getEntity = (context: SDSContext, entity: string) => {
 };
 
 const getIntent = (context: SDSContext) => {
+/*
   // lowercase the utterance and remove tailing "."
   let u = context.recResult[0].utterance.toLowerCase().replace(/\.$/g, "");
   if (u in grammar) {
     return grammar[u].intent;
   }
+  */
+  console.log("nluResult:");
+  console.log(context.nluResult);
   return false;
 };
 
