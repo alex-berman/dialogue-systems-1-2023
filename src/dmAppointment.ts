@@ -61,7 +61,7 @@ const getIntent = (context: SDSContext) => {
   */
   console.log("nluResult:");
   console.log(context.nluResult);
-  return false;
+  return context.nluResult.prediction.topIntent;
 };
 
 export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = {
