@@ -40,15 +40,29 @@ const grammar: Grammar = {
   }
 };
 
-const getEntity = (context: SDSContext, entity: string) => {
+const getEntity = (context: SDSContext, category: string) => {
+/*
   // lowercase the utterance and remove tailing "."
   let u = context.recResult[0].utterance.toLowerCase().replace(/\.$/g, "");
   if (u in grammar) {
-    if (entity in grammar[u].entities) {
-      return grammar[u].entities[entity];
+    if (category in grammar[u].entities) {
+      return grammar[u].entities[category];
     }
   }
   return false;
+  */
+  console.log("getEntity category=" + category);
+  console.log("nluResult:");
+  console.log(context.nluResult);
+  var result = false;
+  context.nluResult.prediction.entities.forEach(entity => {
+    if(entity.category == category) {
+      console.log(entity.text);
+      result = entity.text;
+    }
+  });
+  console.log("returning " + result);
+  return result;
 };
 
 const getIntent = (context: SDSContext) => {
